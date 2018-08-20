@@ -38,11 +38,12 @@ public class IndexController {
     }
 
     @GetMapping("/auth-endpoint")
-    public ModelAndView getAuthEndpoint(
+    public String getAuthEndpoint(
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "state", required = false) String state,
-            @SessionAttribute(value = "state", required = false) String sessionState
+            @SessionAttribute(value = "state", required = false) String sessionState,
+            HttpSession session
     ) {
         try {
             if (error == null && code != null) {
@@ -52,18 +53,17 @@ public class IndexController {
 
                     if (oTokenResponse != null) {
                         User oUser = oClient.getUserInfo(oTokenResponse.getAccessToken());
-                        ModelAndView response = new ModelAndView("home");
 
-                        response.addObject("oUser", oUser);
+                        session.setAttribute("oUser", oUser);
 
-                        return response;
+                        return "redirect:/home";
                     }
                 }
             }
         } catch (Exception ex) {
         }
 
-        return new ModelAndView("redirect:".concat(baseUrl));
+        return "redirect:".concat(baseUrl);
     }
 
     private ReniecIdaasClient getIdaasClient() throws IOException {
