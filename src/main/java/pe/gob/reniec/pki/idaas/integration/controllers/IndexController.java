@@ -10,21 +10,19 @@ import org.springframework.web.servlet.ModelAndView;
 import pe.gob.reniec.pki.idaas.sdk.ReniecIdaasClient;
 import pe.gob.reniec.pki.idaas.sdk.dto.TokenResponse;
 import pe.gob.reniec.pki.idaas.sdk.dto.User;
-import pe.gob.reniec.pki.idaas.sdk.enums.Acr;
-import pe.gob.reniec.pki.idaas.sdk.enums.Scope;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Base64;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author Miguel Pazo (http://miguelpazo.com)
  */
 @Controller
-public class IndexController {
+public class IndexController extends ParentController {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
-    private String baseUrl = "http://localhost:8080/example";
 
     @GetMapping("/")
     public ModelAndView getIndex(HttpSession session) throws IOException {
@@ -61,23 +59,13 @@ public class IndexController {
                 }
             }
         } catch (Exception ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+
+            logger.error(sw.toString());
         }
 
         return "redirect:".concat(baseUrl);
-    }
-
-    private ReniecIdaasClient getIdaasClient() throws IOException {
-        ReniecIdaasClient oClient = new ReniecIdaasClient(getClass().getClassLoader().getResource("reniec_idaas.json").getFile());
-        String state = new String(Base64.getEncoder().encode(String.valueOf(System.currentTimeMillis()).getBytes()));
-
-        oClient.setRedirectUri(baseUrl.concat("/auth-endpoint"));
-        oClient.setAcr(Acr.ONE_FACTOR);
-        oClient.addScope(Scope.PROFILE);
-        oClient.addScope(Scope.EMAIL);
-        oClient.addScope(Scope.PHONE);
-        oClient.setState(state);
-
-        return oClient;
     }
 
 }

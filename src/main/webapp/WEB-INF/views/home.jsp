@@ -26,6 +26,10 @@
                 <p><b>Sub:</b> ${oUser.sub}</p>
             </div>
         </div>
+
+        <div class="col-sm-12 text-center">
+            <a href="${baseUrl}/logout" class="btn btn-danger">Salir</a>
+        </div>
     </div>
 </div>
 </body>
